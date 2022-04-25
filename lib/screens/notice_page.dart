@@ -1,9 +1,10 @@
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:issue3/controller/notice_controller.dart';
 import 'package:issue3/repository/notice_repository.dart';
 import '../model/notice.dart';
+
+
 
 class notice extends StatefulWidget {
   @override
@@ -22,11 +23,13 @@ class _noticeState extends State<notice> {
       body: FutureBuilder<List<Notice>>(
         future: noticeController.fetchNoticeList(),
         builder: (context, snapshot) {
-          //
+          //data를 아직 받아 오지 못했을 때 실행되는 부분.
+          //snapshot.hasData == false 인 경우이다.
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator()); //로딩 애니메이션
           }
 
+          //에러가 발생한 경우 반환되는 부분
           if (snapshot.hasError) {
             return Center(
               child: Text('error'),
@@ -52,7 +55,11 @@ class _noticeState extends State<notice> {
                             InkWell(child: buildCallContainer('patch')),
                             InkWell(child: buildCallContainer('put')),
                             InkWell(
-                              onTap:() {noticeController.deleteNotice(notice!);
+                                onTap: () {
+                                  setState((){
+                                    noticeController.deleteNotice(notice!);
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Item Deleted"),));
                                 },
                                 child: buildCallContainer('delete')),
                           ],
